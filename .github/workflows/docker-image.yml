@@ -38,3 +38,28 @@ jobs:
     - name: Push Docker image to ECR
       run: |
         docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
+
+
+
+
+
+
+            - name: Checkout Terraform repository
+      uses: actions/checkout@v4
+      with:
+        repository: Carlos-login/terraform_devsu
+        path: infra
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: "~> 5.0"
+
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./infra
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
+      working-directory: ./infra
+
