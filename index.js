@@ -12,7 +12,7 @@ app.use('/api/users', usersRouter);
 
 // Ruta principal
 app.get('/', (req, res) => {
-    res.send('Welcome to the main route!');
+    res.send('Bienvenido a la ruta pricinpal!');
 });
 
 // Ruta de healthcheck
