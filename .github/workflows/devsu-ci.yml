@@ -27,12 +27,12 @@ jobs:
 
     - name: Build the Docker image
       run: |
-        IMAGE_TAG=my-image-name:$(date +%s)
+        IMAGE_TAG=my-image-name:latest
         docker build . --file Dockerfile --tag $IMAGE_TAG
 
     - name: Tag Docker image
       run: |
-        IMAGE_TAG=my-image-name:$(date +%s)
+        IMAGE_TAG=my-image-name:latest
         docker tag $IMAGE_TAG ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
     - name: Push Docker image to ECR
