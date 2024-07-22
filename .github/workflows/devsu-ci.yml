@@ -65,11 +65,10 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
     - name: Set up Snyk
-      uses: snyk/actions/setup@v1.0.0
+      uses: snyk/actions/setup@v1
 
     - name: Test for vulnerabilities
       run: snyk test
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
 
