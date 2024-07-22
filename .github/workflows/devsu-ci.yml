@@ -64,8 +64,8 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
-    - name: Run vulnerability analysis
-      uses: snyk/actions/setup@v1
+    - name: Set up Snyk
+      uses: snyk/actions/setup@v2
       with:
         version: 'v1.645.0'
 
