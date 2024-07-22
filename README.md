@@ -1,145 +1,204 @@
-# Demo Devops NodeJs
+README.md
+markdown
+Copiar código
+# Demostración de DevOps NodeJs
 
-This is a simple application to be used in the technical test of DevOps.
+Esta es una aplicación sencilla para utilizar en las pruebas técnicas de DevOps.
 
-## Getting Started
+## Empezando
 
-### Prerequisites
+### Prerrequisitos
 
 - Node.js 18.15.0
 
-### Installation
+### Instalación
 
-Clone this repo.
+1. Clonar este repositorio.
 
 ```bash
 git clone https://bitbucket.org/devsu/demo-devops-nodejs.git
-```
-
-Install dependencies.
-
-```bash
+Instalar dependencias.
+bash
+Copiar código
 npm i
-```
+Base de datos
+La base de datos se genera como un archivo en la ruta principal cuando se ejecuta el proyecto por primera vez y su nombre es dev.sqlite.
 
-### Database
+Considere dar permisos de acceso al archivo para su correcto funcionamiento.
 
-The database is generated as a file in the main path when the project is first run, and its name is `dev.sqlite`.
-
-Consider giving access permissions to the file for proper functioning.
-
-## Usage
-
-To run tests you can use this command.
-
-```bash
+Uso
+Para ejecutar pruebas puedes usar este comando.
+bash
+Copiar código
 npm run test
-```
-
-To run locally the project you can use this command.
-
-```bash
+Para ejecutar localmente el proyecto puedes utilizar este comando.
+bash
+Copiar código
 npm run start
-```
+Abra http://localhost:8000/api/users con su navegador para ver el resultado.
 
-Open http://localhost:8000/api/users with your browser to see the result.
-
-### Features
-
-These services can perform,
-
-#### Create User
-
-To create a user, the endpoint **/api/users** must be consumed with the following parameters:
-
-```bash
-  Method: POST
-```
-
-```json
+Nuevas Rutas
+Ruta Principal
+Método: GET
+URL: /
+Respuesta:
+text
+Copiar código
+Bienvenido a la ruta principal de Devsu  candidato: Carlos Bejarano  correo: cebm.programmer@gmail.com !
+Ruta de Health Check
+Método: GET
+URL: /healthcheck
+Respuesta:
+json
+Copiar código
 {
-    "dni": "dni",
-    "name": "name"
+  "status": "OK"
 }
-```
+Docker
+Dockerfile
+Este proyecto incluye un Dockerfile para facilitar la creación de un contenedor Docker.
 
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
+dockerfile
+Copiar código
+# Usa una imagen base oficial de Node.js
+FROM node:18.15.0
 
-```json
-{
-    "id": 1,
-    "dni": "dni",
-    "name": "name"
-}
-```
+# Establece el directorio de trabajo en el contenedor
+WORKDIR /app
 
-If the response is unsuccessful, we will receive status 400 and the following message:
+# Copia el package.json y package-lock.json al directorio de trabajo
+COPY package*.json ./
 
-```json
-{
-    "error": "error"
-}
-```
+# Instala las dependencias
+RUN npm install
 
-#### Get Users
+# Copia el resto de la aplicación al directorio de trabajo
+COPY . .
 
-To get all users, the endpoint **/api/users** must be consumed with the following parameters:
+# Establece variables de entorno (si es necesario)
+ENV NODE_ENV=production
 
-```bash
-  Method: GET
-```
+# Expone el puerto en el que la aplicación estará escuchando
+EXPOSE 8000
 
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
+# Define el comando que se ejecutará cuando el contenedor se inicie
+CMD ["node", "index.js"]
+Construcción y Ejecución del Contenedor
+Para construir y ejecutar el contenedor Docker, use los siguientes comandos:
 
-```json
-[
-    {
-        "id": 1,
-        "dni": "dni",
-        "name": "name"
-    }
-]
-```
+Construir la imagen Docker
+bash
+Copiar código
+docker build -t demo-devops-nodejs .
+Ejecutar el contenedor Docker
+bash
+Copiar código
+docker run -p 8000:8000 demo-devops-nodejs
+Abra http://localhost:8000/api/users con su navegador para ver el resultado.
 
-#### Get User
+Pipelines
+Este proyecto incluye dos pipelines configurados con GitHub Actions.
 
-To get an user, the endpoint **/api/users/<id>** must be consumed with the following parameters:
+Pipeline de Build y Deploy
+Este pipeline se ejecuta en cada push a la rama main y realiza las siguientes acciones:
 
-```bash
-  Method: GET
-```
+Compila la imagen Docker
+Etiqueta la imagen Docker
+Publica la imagen Docker en Amazon ECR
+Actualiza el servicio de Amazon ECS con la nueva imagen
+yaml
+Copiar código
+name: Build and Deploy
 
-If the response is successful, the service will return an HTTP Status 200 and a message with the following structure:
+on:
+  push:
+    branches: [ "main" ]
 
-```json
-{
-    "id": 1,
-    "dni": "dni",
-    "name": "name"
-}
-```
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-If the user id does not exist, we will receive status 404 and the following message:
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-```json
-{
-    "error": "User not found: <id>"
-}
-```
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-If the response is unsuccessful, we will receive status 400 and the following message:
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
 
-```json
-{
-    "errors": [
-        "error"
-    ]
-}
-```
+    - name: Build the Docker image
+      run: |
+        IMAGE_TAG=my-image-name:latest
+        docker build . --file Dockerfile --tag $IMAGE_TAG
 
-## License
+    - name: Tag Docker image
+      run: |
+        IMAGE_TAG=my-image-name:latest
+        docker tag $IMAGE_TAG ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-Copyright © 2023 Devsu. All rights reserved.
+    - name: Push Docker image to ECR
+      run: |
+        docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
 
-paso 1 :
-reparar servidro agregar ruta / y ruta /healthcheck
+    - name: Update ECS service with new image
+      run: |
+        aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER_NAME }} --service ${{ secrets.ECS_SERVICE_NAME }} --force-new-deployment
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+Pipeline de Pruebas en Pull Requests
+Este pipeline se ejecuta en cada pull request a la rama main y realiza las siguientes acciones:
+
+Instala las dependencias
+Ejecuta las pruebas unitarias
+yaml
+Copiar código
+name: pull-request-ci
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '22'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Run unit tests
+      run: npm test
+
+    # Uncomment and configure the following steps to use SonarQube for SAST
+    # - name: Set up SonarQube Scanner
+    #   uses: sonarsource/sonarcloud-github-action@v1.9.0
+
+    # - name: Run SonarQube Scanner
+    #   env:
+    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    #   run: |
+    #     sonar-scanner \
+    #       -Dsonar.projectKey=your_project_key \
+    #       -Dsonar.organization=your_organization_key \
+    #       -Dsonar.sources=. \
+    #       -Dsonar.host.url=https://sonarcloud.io \
+    #       -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+Licencia
+Copyright © 2023 Devsu. Todos los derechos reservados.
