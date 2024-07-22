@@ -12,7 +12,7 @@ app.use('/api/users', usersRouter);
 
 // Ruta principal
 app.get('/', (req, res) => {
-    res.send('Bienvenido a la ruta pricinpal de Devsu  correo candidato: cebm.programmer@gmail.com !');
+    res.send('Bienvenido a la ruta pricinpal!');
 });
 
 // Ruta de healthcheck
