@@ -12,111 +12,132 @@ Esta es una aplicación sencilla para utilizar en las pruebas técnicas de DevOp
 
 1. Clonar este repositorio.
 
-```bash
-git clone https://bitbucket.org/devsu/demo-devops-nodejs.git
-
+    ```bash
+    git clone https://bitbucket.org/devsu/demo-devops-nodejs.git
+    ```
 
 2. Instalar dependencias.
 
-npm i
+    ```bash
+    npm i
+    ```
 
+## Base de datos
 
-Base de datos
-La base de datos se genera como un archivo en la ruta principal cuando se ejecuta el proyecto por primera vez y su nombre es dev.sqlite.
+La base de datos se genera como un archivo en la ruta principal cuando se ejecuta el proyecto por primera vez y su nombre es `dev.sqlite`.
 
 Considere dar permisos de acceso al archivo para su correcto funcionamiento.
 
-Uso
-Para ejecutar pruebas puedes usar este comando.
+## Uso
 
-npm run test
+### Para ejecutar pruebas puedes usar este comando.
 
-Para ejecutar localmente el proyecto puedes utilizar este comando.
+    ```bash
+    npm run test
+    ```
 
-npm run start
+### Para ejecutar localmente el proyecto puedes utilizar este comando.
 
-Abra https://devsu.cbejaranodevops.com/api/users con su navegador para ver el resultado.
+    ```bash
+    npm run start
+    ```
 
-Nuevas Rutas
-Ruta Principal
-Método: GET
-URL: /
-Respuesta:
+Abra [https://devsu.cbejaranodevops.com/api/users](https://devsu.cbejaranodevops.com/api/users) con su navegador para ver el resultado.
 
-Bienvenido a la ruta principal de Devsu  candidato: Carlos Bejarano  correo: cebm.programmer@gmail.com !
+## Nuevas Rutas
 
+### Ruta Principal
 
-Ruta de Health Check
-Método: GET
-URL: /healthcheck
-Respuesta:
+- Método: GET
+- URL: `/`
+- Respuesta: 
 
-{
-  "status": "OK"
-}
+    ```text
+    Bienvenido a la ruta principal de Devsu  candidato: Carlos Bejarano  correo: cebm.programmer@gmail.com !
+    ```
 
+### Ruta de Health Check
 
-Docker
-Dockerfile
+- Método: GET
+- URL: `/healthcheck`
+- Respuesta:
+
+    ```json
+    {
+      "status": "OK"
+    }
+    ```
+
+## Docker
+
+### Dockerfile
+
 Este proyecto incluye un Dockerfile para facilitar la creación de un contenedor Docker.
 
-# Usa una imagen base oficial de Node.js
-FROM node:18.15.0
+    ```dockerfile
+    # Usa una imagen base oficial de Node.js
+    FROM node:18.15.0
 
-# Establece el directorio de trabajo en el contenedor
-WORKDIR /app
+    # Establece el directorio de trabajo en el contenedor
+    WORKDIR /app
 
-# Copia el package.json y package-lock.json al directorio de trabajo
-COPY package*.json ./
+    # Copia el package.json y package-lock.json al directorio de trabajo
+    COPY package*.json ./
 
-# Instala las dependencias
-RUN npm install
+    # Instala las dependencias
+    RUN npm install
 
-# Copia el resto de la aplicación al directorio de trabajo
-COPY . .
+    # Copia el resto de la aplicación al directorio de trabajo
+    COPY . .
 
-# Establece variables de entorno (si es necesario)
-ENV NODE_ENV=production
+    # Establece variables de entorno (si es necesario)
+    ENV NODE_ENV=production
 
-# Expone el puerto en el que la aplicación estará escuchando
-EXPOSE 8000
+    # Expone el puerto en el que la aplicación estará escuchando
+    EXPOSE 8000
 
-# Define el comando que se ejecutará cuando el contenedor se inicie
-CMD ["node", "index.js"]
+    # Define el comando que se ejecutará cuando el contenedor se inicie
+    CMD ["node", "index.js"]
+    ```
 
+### Construcción y Ejecución del Contenedor
 
-Construcción y Ejecución del Contenedor
 Para construir y ejecutar el contenedor Docker, use los siguientes comandos:
 
-Construir la imagen Docker
+1. Construir la imagen Docker
 
+    ```bash
+    docker build -t demo-devops-nodejs .
+    ```
 
-docker build -t demo-devops-nodejs .
-Ejecutar el contenedor Docker
- 
- 
-docker run -p 8000:8000 demo-devops-nodejs
-Abra https://devsu.cbejaranodevops.com/api/users con su navegador para ver el resultado.
+2. Ejecutar el contenedor Docker
 
+    ```bash
+    docker run -p 8000:8000 demo-devops-nodejs
+    ```
 
-Pipelines
+Abra [https://devsu.cbejaranodevops.com/api/users](https://devsu.cbejaranodevops.com/api/users) con su navegador para ver el resultado.
+
+## Pipelines
+
 Este proyecto incluye dos pipelines configurados con GitHub Actions.
 
-Pipeline de Build y Deploy
-Este pipeline se ejecuta en cada push a la rama main y realiza las siguientes acciones:
+### Pipeline de Build y Deploy
 
-Compila la imagen Docker
-Etiqueta la imagen Docker
-Publica la imagen Docker en Amazon ECR
-Actualiza el servicio de Amazon ECS con la nueva imagen
+Este pipeline se ejecuta en cada push a la rama `main` y realiza las siguientes acciones:
 
+- Compila la imagen Docker
+- Etiqueta la imagen Docker
+- Publica la imagen Docker en Amazon ECR
+- Actualiza el servicio de Amazon ECS con la nueva imagen
 
-Pipeline de Pruebas en Pull Requests
-Este pipeline se ejecuta en cada pull request a la rama main y realiza las siguientes acciones:
+### Pipeline de Pruebas en Pull Requests
 
-Instala las dependencias
-Ejecuta las pruebas unitarias
+Este pipeline se ejecuta en cada pull request a la rama `main` y realiza las siguientes acciones:
 
+- Instala las dependencias
+- Ejecuta las pruebas unitarias
 
-Licencia
+## Licencia
+
 Copyright © 2023 Devsu. Todos los derechos reservados.
