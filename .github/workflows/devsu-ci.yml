@@ -64,12 +64,13 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
 
-    - name: Set up Snyk
-      uses: snyk/actions/setup@v2
-      with:
-        version: 'v1.1138.0'
+    - name: Install Trivy
+      run: |
+        sudo apt-get install wget -y
+        wget https://github.com/aquasecurity/trivy/releases/download/v0.22.0/trivy_0.22.0_Linux-64bit.deb
+        sudo dpkg -i trivy_0.22.0_Linux-64bit.deb
 
-    - name: Test for vulnerabilities
-      run: snyk test
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    - name: Scan Docker image for vulnerabilities
+      run: |
+        IMAGE_TAG=my-image-name:latest
+        trivy image ${{ secrets.ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}:latest
