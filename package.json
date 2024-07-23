@@ -18,7 +18,7 @@
     "express": "4.18.2",
     "sequelize": "6.31.0",
     "sqlite3": "5.1.6",
-    "yup": "1.0.2"
+    "yup": "1.4.0"
   },
   "devDependencies": {
     "@babel/preset-env": "7.21.4",
